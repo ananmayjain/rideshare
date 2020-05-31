@@ -2,17 +2,55 @@
 
 import pymongo
 import pprint
+import os
 
-client = pymongo.MongoClient("mongodb://localhost:60000/")
+MONGO_PORT = 12717
 
-# mydb = myclient["mydatabase"]
-# mycol = mydb["customers"]
-# mydict = { "name": "John", "address": "Highway 37" }
-# x = mycol.insert_one(mydict)
+db = None
+drivers = None
 
-db = client["database"]
-collection = db["authors"]
+def add_driver(args):
+    global db, drivers
 
-result = collection.find_one()
+    driver = {}
+    for i in range(len(args)):
+        args[i] = args[i].split('=')
+        driver[args[i][0]] = args[i][1]
 
-print(result)
+    drivers.insert_one(driver)
+
+def get_driver(args):
+    global db, drivers
+
+    driver = {}
+    for i in range(len(args)):
+        args[i] = args[i].split('=')
+        driver[args[i][0]] = args[i][1]
+
+    result = drivers.find_one(driver)
+
+    if (result == None):
+        print("Didn't Find")
+    else:
+        print(result)
+
+def start_client():
+    global db, drivers
+
+    # os.system("mongod --dbpath=/data/drivers --port %i" % MONGO_PORT)
+
+    try:
+        client = pymongo.MongoClient("mongodb://localhost:%i/" % MONGO_PORT)
+    except:
+        print("Client Failed to Load")
+        return
+
+    db = client["database"]
+    drivers = db["drivers"]
+
+class Driver:
+
+    def __init__(self, args):
+        self.firstname = args["fname"]
+        self.lastname = args["lname"]
+        self.gender = args["gender"]
