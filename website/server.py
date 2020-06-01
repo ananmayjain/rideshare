@@ -17,6 +17,9 @@ HOST, PORT = "192.168.0.151", 80
 homepage = None
 reg_driver_page = None
 find_driver_page = None
+sign_up_page_html = None
+sign_up_page_css = None
+sign_up_page_js = None
 
 tcp_server = None
 
@@ -48,6 +51,15 @@ class tcpHandler(socketserver.StreamRequestHandler):
             self.wfile.write(bytes(homepage, 'ascii'))
             return
 
+        elif args[1] == "/sign_up.html":
+            self.wfile.write(bytes(sign_up_page_html, 'ascii'))
+
+        elif args[1] == "/sign_up.css":
+            self.wfile.write(bytes(sign_up_page_css, 'ascii'))
+
+        elif args[1] == "/sign_up.js":
+            self.wfile.write(bytes(sign_up_page_js, 'utf-8'))
+
         elif args[1] == "/register_driver" or args[1] == "/register_driver?":
             self.wfile.write(bytes(reg_driver_page, 'ascii'))
             return
@@ -66,11 +78,8 @@ class tcpHandler(socketserver.StreamRequestHandler):
             print(data)
             mongo_client.get_driver(data)
 
-        self.wfile.write(bytes(homepage, 'ascii'))
-
     def process_post(self, args):
         pass
-
 
 def sigintHandler(sig, frame):
     global tcp_server
@@ -83,8 +92,9 @@ def reload_html():
     while True:
         global homepage
         global reg_driver_page, find_driver_page
+        global sign_up_page_html, sign_up_page_css, sign_up_page_js
 
-        with open("./index.html", 'r') as file:
+        with open("./sign_up/sign_up.html", 'r') as file:
             homepage = file.read()
 
         with open("./register_driver.html", 'r') as file:
@@ -93,7 +103,16 @@ def reload_html():
         with open("./find_driver.html", 'r') as file:
             find_driver_page = file.read()
 
-        time.sleep(5)
+        with open("./sign_up/sign_up.html", 'r') as file:
+            sign_up_page_html = file.read()
+
+        with open("./sign_up/sign_up.css", 'r') as file:
+            sign_up_page_css = file.read()
+
+        with open("./sign_up/sign_up.js", 'r') as file:
+            sign_up_page_js = file.read()
+
+        time.sleep(2)
 
 def main():
 
