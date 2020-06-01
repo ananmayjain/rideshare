@@ -5,13 +5,7 @@ $('.form').find('input, textarea').on('keyup blur focus', function (e) {
 
     label.addClass('active highlight');
 
-	  if (e.type === 'keyup') {
-			if ($this.val() === '') {
-          label.removeClass('active highlight');
-        } else {
-          label.addClass('active highlight');
-        }
-    } else if (e.type === 'blur') {
+	  if (e.type === 'blur') {
     	if( $this.val() === '' ) {
     		label.removeClass('active highlight');
 			} else {
