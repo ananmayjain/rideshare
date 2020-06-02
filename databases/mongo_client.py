@@ -4,38 +4,38 @@ import pymongo
 import pprint
 import os
 
-MONGO_PORT = 12717
+MONGO_PORT = 60000
 
 db = None
-drivers = None
+valid_accounts = None
 
-def add_driver(args):
-    global db, drivers
+def add_account(args):
+    global db, valid_accounts
+    account = dict(args)
 
-    driver = {}
-    for i in range(len(args)):
-        args[i] = args[i].split('=')
-        driver[args[i][0]] = args[i][1]
+    test_d = {}
+    test_d["emailid"] = account["emailid"]
+    result = valid_accounts.find_one(test_d)
 
-    drivers.insert_one(driver)
+    if result != None:
+        return False
 
-def get_driver(args):
-    global db, drivers
+    valid_accounts.insert_one(account)
 
-    driver = {}
-    for i in range(len(args)):
-        args[i] = args[i].split('=')
-        driver[args[i][0]] = args[i][1]
+    return True
 
-    result = drivers.find_one(driver)
+def get_account(args):
+    global db, valid_accounts
 
-    if (result == None):
-        print("Didn't Find")
-    else:
-        print(result)
+    account = dict(args)
+
+    if valid_accounts.find_one(account) == None:
+        return False
+
+    return True
 
 def start_client():
-    global db, drivers
+    global db, valid_accounts
 
     # os.system("mongod --dbpath=/data/drivers --port %i" % MONGO_PORT)
 
@@ -46,11 +46,11 @@ def start_client():
         return
 
     db = client["database"]
-    drivers = db["drivers"]
+    valid_accounts = db["valid_accounts"]
 
-class Driver:
-
+class account:
     def __init__(self, args):
         self.firstname = args["fname"]
         self.lastname = args["lname"]
-        self.gender = args["gender"]
+        self.email = args["email"]
+        self.passwd = args["passwd"]
