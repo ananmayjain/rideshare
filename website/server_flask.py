@@ -10,6 +10,8 @@ import os
 
 from flask import Flask, render_template, request, redirect
 
+import mail_api
+
 sys.path.insert(0, "..")
 import databases.mongo_client as mongo_client
 
@@ -17,7 +19,7 @@ DEBUG = True
 
 app = Flask(__name__)
 
-HOST = "192.168.0.151"
+HOST = "192.168.0.103"
 PORT = 80
 
 @app.route("/", methods=["GET", "POST"])
@@ -59,6 +61,19 @@ def singin():
 
     return render_template("sign_up.html", invalid_login=1)
 
+@app.route("/confirm_account/<token_emailid>", methods=["GET", "POST"])
+def account_confirmation(token_emailid):
+
+    if request.method == "POST":
+        print(request.form)
+
+    else:
+        token = token_emailid[0:64]
+        emailid = token_emailid[64:]
+        mongo_client.verify_account(emailid, token)
+
+    return render_template("index.html")
+
 # SIGNIT HANDLER
 def sigintHandler(sig, frame):
     sys.exit(0)
@@ -99,6 +114,10 @@ def main():
     # r.start()
 
     mongo_client.start_client()
+
+    mongo_client.delete_client("ananmay.jain@gmail.com")
+
+    mail_api.login_session()
 
     app.run(HOST, PORT, debug=DEBUG)
 
